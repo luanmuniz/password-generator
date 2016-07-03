@@ -1,0 +1,8 @@
+test
+coverage
+.jshintrc
+.travis.yml
+.eslintrc
+.editorconfig
+CHANGELOG.md
+Gulpfile.js
