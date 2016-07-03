@@ -41,8 +41,8 @@ Having trouble? Or new ideas? Post a new issue! We will be glad to help you!
 
 [travis-url]: https://travis-ci.org/luanmuniz/password-generator
 [travis-image]: https://travis-ci.org/luanmuniz/password-generator.png?branch=master
-[depstat-url]: https://david-dm.org/luanmuniz/password-generator
-[depstat-image]: https://david-dm.org/luanmuniz/password-generator.png
+[depstat-url]: https://david-dm.org/luanmuniz/password-generator#info=devDependencies
+[depstat-image]: https://david-dm.org/luanmuniz/password-generator/dev-status.png
 [nodei-image]: https://nodei.co/npm/password-generator.png
 [nodei-url]: https://nodei.co/npm/password-generator
 [node-image]: https://badge.fury.io/js/password-generator.svg
