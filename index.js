@@ -55,7 +55,7 @@ var PasswordGenerator = {
 
 	/**
 	 * Merge default options with Users options
-	 * @param {Number|Object} userOptions Arguments passing in the function generate
+	 * @param {(Number|Object)} userOptions Arguments passing in the function generate
 	 * @return {Object} Object with the final options
 	 */
 	mergeOptions(userOptions) {
