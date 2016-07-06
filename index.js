@@ -77,11 +77,25 @@ var PasswordGenerator = {
 		}
 
 		if( userObjOptions === Object(userObjOptions) ) {
-			defaultValues.size = (userObjOptions.size || defaultValues.size);
-			defaultValues.numbers = (userObjOptions.numbers || defaultValues.numbers);
-			defaultValues.symbols = (userObjOptions.symbols || defaultValues.symbols);
-			defaultValues.allowUppercase = (userObjOptions.allowUppercase || defaultValues.allowUppercase);
-			defaultValues.allowRepetintion = (userObjOptions.allowRepetintion || defaultValues.allowRepetintion);
+			if(userObjOptions.hasOwnProperty('size')) {
+				defaultValues.size = userObjOptions.size;
+			}
+
+			if(userObjOptions.hasOwnProperty('numbers')) {
+				defaultValues.numbers = userObjOptions.numbers;
+			}
+
+			if(userObjOptions.hasOwnProperty('symbols')) {
+				defaultValues.symbols = userObjOptions.symbols;
+			}
+
+			if(userObjOptions.hasOwnProperty('allowUppercase')) {
+				defaultValues.allowUppercase = userObjOptions.allowUppercase;
+			}
+
+			if(userObjOptions.hasOwnProperty('allowRepetintion')) {
+				defaultValues.allowRepetintion = userObjOptions.allowRepetintion;
+			}
 		}
 
 		return defaultValues;
@@ -97,7 +111,7 @@ var PasswordGenerator = {
 	generateNextChar(possibleChars, hash, options) {
 		let nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
 
-		if(!options.allowRepetintion && PasswordGenerator.checkForRepetintion(hash, nextChar) && (options.numbers <= PasswordGenerator.numbersChars.length &&	options.symbols <= PasswordGenerator.symbolsChars.length)) {
+		if(!options.allowRepetintion && PasswordGenerator.checkForRepetintion(hash, nextChar) && (options.numbers <= PasswordGenerator.numbersChars.length && options.symbols <= PasswordGenerator.symbolsChars.length)) {
 			nextChar = PasswordGenerator.generateNextChar(possibleChars, hash, options);
 		}
 
@@ -120,10 +134,16 @@ var PasswordGenerator = {
 	 * @return {String} shuffled string
 	 */
 	shuffleString(finalPassword) {
-		return finalPassword
+		var shuffledString = finalPassword
 			.split('')
 			.sort(() => 0.5 - Math.random()) // eslint-disable-line no-magic-numbers
 			.join('');
+
+		if(shuffledString === finalPassword) {
+			return PasswordGenerator.shuffleString(finalPassword);
+		}
+
+		return shuffledString;
 	}
 
 };

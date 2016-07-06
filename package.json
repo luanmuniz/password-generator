@@ -11,7 +11,7 @@
   },
   "scripts": {
     "mocha": "mocha --reporter spec",
-    "cover": "istanbul cover _mocha -- -R spec test/*",
+    "cover": "istanbul cover _mocha -- -R spec test/* && istanbul check-coverage --statement 100 --branch 100 --line 100 --function 100",
     "test": "gulp test && npm run mocha && npm run cover",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "preversion": "npm test",
