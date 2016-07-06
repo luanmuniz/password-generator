@@ -1,5 +1,5 @@
 {
-  "name": "password-generator",
+  "name": "@luanmuniz/password-generator",
   "version": "0.0.0",
   "description": "Yet just another password generator",
   "main": "index.js",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^2.11.9",
+    "david": "^7.0.2",
     "eslint": "^3.0.1",
     "istanbul": "^0.4.4",
     "jshint": "^2.9.2",
