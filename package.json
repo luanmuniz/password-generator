@@ -17,7 +17,7 @@
     "test": "npm run eslint && npm run david && npm run mocha && npm run cover",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
     "preversion": "npm test",
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish --access=public"
   },
   "pre-commit": [
     "precommit-msg",
