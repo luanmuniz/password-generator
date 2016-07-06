@@ -8,6 +8,7 @@ Create the library
 Future Features
 =========
 
+- Improve tests
 - Strenth measure of the password
 - Avoid ambiguous characters
 - Generate password with english words
