@@ -45,7 +45,7 @@ Having trouble? Or new ideas? Post a new issue! We will be glad to help you!
 [depstat-image]: https://david-dm.org/luanmuniz/password-generator/dev-status.png
 [nodei-image]: https://nodei.co/npm/@luanmuniz/password-generator.png
 [nodei-url]: https://nodei.co/npm/@luanmuniz/password-generator
-[node-image]: https://badge.fury.io/js/password-generator.svg
-[node-url]: http://badge.fury.io/js/password-generator
+[node-image]: https://badge.fury.io/js/%40luanmuniz%2Fpassword-generator.svg
+[node-url]: http://badge.fury.io/js/%40luanmuniz%2Fpassword-generator
 [coverrals-image]: https://coveralls.io/repos/github/luanmuniz/password-generator/badge.svg?branch=master
 [coverrals-url]: https://coveralls.io/github/luanmuniz/password-generator?branch=master

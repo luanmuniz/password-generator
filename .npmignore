@@ -1,8 +1,10 @@
-test
 coverage
-.jshintrc
-.travis.yml
-.eslintrc
+test
+.coveralls.yml
 .editorconfig
+.eslintrc
+.gitignore
+.travis.yml
 CHANGELOG.md
-Gulpfile.js
+CONTRIBUTING.md
+README.md
