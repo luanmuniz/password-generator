@@ -23,7 +23,7 @@ generatePassword({
 	allowUppercase: true,
 	allowRepetintion: true
 });
-//=> 'Ktzi96+%>a'
+//=> '23393Rz@}_'
 
 generatePassword(20, {
 	numbers: 5,
@@ -31,7 +31,7 @@ generatePassword(20, {
 	allowUppercase: true,
 	allowRepetintion: true
 });
-//=> '7G=:X8yxx%lCPpKlwkWx'
+//=> ';64xxy*DC6Zyt<UjZ75B'
 ```
 ## API
 
