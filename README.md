@@ -8,22 +8,74 @@ A small library to generate random strings
 
 ## Installation
 
-`npm install @luanmuniz/password-generator`
+```shell
+$ npm install --save @luanmuniz/password-generator
+```
 
 ## How it works
-```javascript
-const passwordGenerator = require('@luanmuniz/password-generator');
+```js
+const generatePassword = require('@luanmuniz/password-generator').generate;
 
-let passwordString = passwordGenerator.generate({
+generatePassword({
 	size: 10,
 	numbers: 5,
 	symbols: 3,
-	allowUppercase: true
+	allowUppercase: true,
 	allowRepetintion: true
 });
+//=> 'Ktzi96+%>a'
 
-console.log(passwordString);
+generatePassword(20, {
+	numbers: 5,
+	symbols: 3,
+	allowUppercase: true,
+	allowRepetintion: true
+});
+//=> '7G=:X8yxx%lCPpKlwkWx'
 ```
+## API
+
+### generate([size], [options])
+
+#### size
+Type: `String`
+The total length of your string
+
+#### options
+
+##### size
+Type: `String`<br>
+Default: `15`
+
+The total length of your string
+
+##### numbers
+Type: `Boolean or Integer`<br>
+Default: `5`<br>
+All Numbers allowed: `0123456789`
+
+`true` or `false` if numbers are allowed<br>
+`Integers` for the numbers of numbers that your final password will have
+
+##### symbols
+Type: `Boolean or Integer`<br>
+Default: `5`<br>
+All Symbols allowed: `!@#$%&*()_+-={}[]:;<>?,./|`
+
+`true` or `false` if numbers are allowed<br>
+`Integers` for the numbers of symbols that your final password will have
+
+##### allowUppercase
+Type: `Boolean`<br>
+Default: `true`
+
+`true` or `false` if Uppercase characters are allowed
+
+##### allowRepetintion
+Type: `Boolean`<br>
+Default: `false`
+
+`true` or `false` if your final password can have repetitive characters
 
 ## Tests
 `npm test`
