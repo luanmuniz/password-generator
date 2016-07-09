@@ -35,7 +35,7 @@ var PasswordGenerator = {
 				numberPassword += PasswordGenerator.generateNextChar(PasswordGenerator.numbersChars, numberPassword, options);
 			}
 
-			finalPassword = finalPassword + numberPassword;
+			finalPassword = numberPassword + finalPassword;
 		}
 
 		if(options.symbols > 0) {
@@ -83,10 +83,18 @@ var PasswordGenerator = {
 
 			if(userObjOptions.hasOwnProperty('numbers')) {
 				defaultValues.numbers = userObjOptions.numbers;
+
+				if(defaultValues.size < defaultValues.numbers) {
+					defaultValues.numbers = defaultValues.size;
+				}
 			}
 
 			if(userObjOptions.hasOwnProperty('symbols')) {
 				defaultValues.symbols = userObjOptions.symbols;
+
+				if(defaultValues.size < defaultValues.symbols) {
+					defaultValues.symbols = defaultValues.size;
+				}
 			}
 
 			if(userObjOptions.hasOwnProperty('allowUppercase')) {
@@ -109,7 +117,7 @@ var PasswordGenerator = {
 	 * @return {String} The next char for the password
 	*/
 	generateNextChar(possibleChars, hash, options) {
-		let nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
+		var nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
 
 		if(!options.allowRepetintion && PasswordGenerator.checkForRepetintion(hash, nextChar) && (options.numbers <= PasswordGenerator.numbersChars.length && options.symbols <= PasswordGenerator.symbolsChars.length)) {
 			nextChar = PasswordGenerator.generateNextChar(possibleChars, hash, options);
