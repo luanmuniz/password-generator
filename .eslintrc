@@ -28,7 +28,7 @@
 		"no-implied-eval": "error",
 		"no-lone-blocks": "error",
 		"no-loop-func": "error",
-		"no-magic-numbers": ["error", { "ignore": [-1, 0, 1, 2, 4, 8, 10, 20, 24, 30, 60, 100, 1000, 1024] }],
+		"no-magic-numbers": ["error", { "ignore": [-1, 0, 1, 2, 3, 4, 5, 6, 8, 10, 20, 24, 25, 30, 50, 60, 70, 80, 90, 100, 1000, 1024] }],
 		"no-multi-spaces": "error",
 		"no-multi-str": "error",
 		"no-native-reassign": "error",

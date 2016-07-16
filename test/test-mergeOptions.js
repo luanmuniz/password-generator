@@ -1,7 +1,8 @@
 'use strict';
 
 var expect = require('chai').expect;
-var passwordGenerator = require('../index');
+var rewire = require('rewire');
+var passwordGenerator = rewire('../index').__get__('PasswordGenerator');
 
 describe('mergeOptions', function() {
 	var defaultValues = {

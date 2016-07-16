@@ -14,7 +14,7 @@ $ npm install --save @luanmuniz/password-generator
 
 ## How it works
 ```js
-const generatePassword = require('@luanmuniz/password-generator').generate;
+const generatePassword = require('@luanmuniz/password-generator');
 
 generatePassword({
 	size: 10,
@@ -32,6 +32,7 @@ generatePassword(20, {
 	allowRepetintion: true
 });
 //=> ';64xxy*DC6Zyt<UjZ75B'
+
 ```
 ## API
 
@@ -76,6 +77,43 @@ Type: `Boolean`<br>
 Default: `false`
 
 `true` or `false` if your final password can have repetitive characters
+
+## Strength Algorithm
+
+#### Password Length
+- -20 Points: Less than 6 characters
+- -10 Points: 6 to 10 characters
+- 25 Points: more than 10
+
+#### Letters:
+- 0 Points: No letters
+- 10 Points: Letters are all lower case
+- 20 Points: Letters are upper case and lower case
+
+#### Numbers:
+- 0 Points: No numbers
+- 10 Points: 1 number
+- 20 Points: 3 or more numbers
+
+#### Symbols:
+- 0 Points: No symbols
+- 10 Points: 1 symbol
+- 25 Points: More than 1 symbols
+
+#### Bonus:
+- 2 Points: Letters and numbers
+- 3 Points: Letters, numbers, and symbols
+- 5 Points: Mixed case letters, numbers, and symbols
+
+#### Password Text Range:
+
+- >= 90: Very Secure
+- >= 80: Secure
+- >= 70: Very Strong
+- >= 60: Strong
+- >= 50: Average
+- >= 25: Weak
+- >= 0: Very Weak
 
 ## Tests
 `npm test`

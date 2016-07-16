@@ -1,6 +1,6 @@
 'use strict';
 
-var PasswordGenerator = {
+const PasswordGenerator = {
 
 	numbersChars: '0123456789',
 	alphabetChars: 'abcdefghijklmnopqrstuvwxyz',
@@ -17,6 +17,7 @@ var PasswordGenerator = {
 		var finalPassword = '',
 			numberPassword = '',
 			symbolsPassword = '',
+			passwordStrength = {},
 			possibleChars = PasswordGenerator.alphabetChars,
 			options = PasswordGenerator.mergeOptions(arguments);
 
@@ -49,8 +50,12 @@ var PasswordGenerator = {
 		}
 
 		finalPassword = PasswordGenerator.shuffleString(finalPassword);
+		passwordStrength = PasswordGenerator.getStrength(finalPassword);
 
-		return finalPassword;
+		return {
+			password: finalPassword,
+			strength: passwordStrength
+		};
 	},
 
 	/**
@@ -117,7 +122,7 @@ var PasswordGenerator = {
 	 * @return {String} The next char for the password
 	*/
 	generateNextChar(possibleChars, hash, options) {
-		var nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
+		let nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
 
 		if(!options.allowRepetintion && PasswordGenerator.checkForRepetintion(hash, nextChar) && (options.numbers <= PasswordGenerator.numbersChars.length && options.symbols <= PasswordGenerator.symbolsChars.length)) {
 			nextChar = PasswordGenerator.generateNextChar(possibleChars, hash, options);
@@ -152,8 +157,71 @@ var PasswordGenerator = {
 		}
 
 		return shuffledString;
+	},
+
+	getStrength(strPassword) {
+		var score = 0,
+			description = 'Very Weak',
+			lettersCount = strPassword.match(/[a-z]/g).length,
+			uppercaseCount = strPassword.match(/[A-Z]/g).length,
+			symbolsCount = strPassword.match(/[^0-9a-zA-Z]/g).length,
+			numbersCount = strPassword.match(/[0-9]/g).length;
+
+		// Score for length
+		if(strPassword.length < 6) {
+			score -= 20;
+		} else if(strPassword.length > 5 && strPassword.length < 10) {
+			score -= 10;
+		} else if(strPassword.length > 10) {
+			score += 25;
+		}
+
+		// Score for Letters
+		if(lettersCount && !uppercaseCount) {
+			score += 10;
+		} else if(lettersCount && uppercaseCount) {
+			score += 20;
+		}
+
+		// Score for Numbers
+		if(numbersCount >= 1 && numbersCount < 3) {
+			score += 10;
+		} else if(numbersCount >= 3) {
+			score += 20;
+		}
+
+		// Score for Symbols
+		if(symbolsCount === 1) {
+			score += 10;
+		} else if(symbolsCount > 1) {
+			score += 25;
+		}
+
+		// Score Bonus
+		if(lettersCount && numbersCount) {
+			score += 2;
+		}
+
+		if(lettersCount && numbersCount && symbolsCount) {
+			score += 3;
+		}
+
+		if(lettersCount && numbersCount && symbolsCount && uppercaseCount) {
+			score += 5;
+		}
+
+		switch (true) {
+			case (score >= 90): description = 'Very Secure'; break;
+			case (score >= 80): description = 'Secure'; break;
+			case (score >= 70): description = 'Very Strong'; break;
+			case (score >= 60): description = 'Strong'; break;
+			case (score >= 50): description = 'Average'; break;
+			case (score >= 25): description = 'Week'; break;
+		}
+
+		return { score, description };
 	}
 
 };
 
-module.exports = Object.create(PasswordGenerator);
+module.exports = Object.create(PasswordGenerator).generate;
