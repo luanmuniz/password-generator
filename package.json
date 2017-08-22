@@ -1,6 +1,6 @@
 {
   "name": "@luanmuniz/password-generator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Yet just another password generator",
   "main": "index.js",
   "directories": {
