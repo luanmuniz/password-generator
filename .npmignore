@@ -4,7 +4,9 @@ test
 .editorconfig
 .eslintrc
 .gitignore
-.travis.yml
+.github
 CHANGELOG.md
 CONTRIBUTING.md
+CODE_OF_CONDUCT.md
 README.md
+*.tgz

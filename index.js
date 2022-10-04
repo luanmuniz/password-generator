@@ -1,6 +1,6 @@
 'use strict';
 
-var PasswordGenerator = {
+const PasswordGenerator = {
 
 	numbersChars: '0123456789',
 	alphabetChars: 'abcdefghijklmnopqrstuvwxyz',
@@ -14,11 +14,12 @@ var PasswordGenerator = {
 	 */
 
 	generate() {
-		var finalPassword = '',
-			numberPassword = '',
-			symbolsPassword = '',
-			possibleChars = PasswordGenerator.alphabetChars,
-			options = PasswordGenerator.mergeOptions(arguments);
+		const options = PasswordGenerator.mergeOptions(arguments);
+
+		let finalPassword = '';
+		let numberPassword = '';
+		let symbolsPassword = '';
+		let possibleChars = PasswordGenerator.alphabetChars;
 
 		if(options.allowUppercase) {
 			possibleChars += PasswordGenerator.alphabetChars.toUpperCase();
@@ -59,14 +60,14 @@ var PasswordGenerator = {
 	 * @return {Object} Object with the final options
 	 */
 	mergeOptions(userOptions) {
-		var userObjOptions = userOptions[0],
-			defaultValues = {
-				size: 16,
-				numbers: 5,
-				symbols: 5,
-				allowUppercase: true,
-				allowRepetintion: false
-			};
+		let userObjOptions = userOptions[0];
+		let defaultValues = {
+			size: 16,
+			numbers: 5,
+			symbols: 5,
+			allowUppercase: true,
+			allowRepetintion: false
+		};
 
 		if(typeof userObjOptions === 'number') {
 			defaultValues.size = userObjOptions;
@@ -117,10 +118,10 @@ var PasswordGenerator = {
 	 * @return {String} The next char for the password
 	*/
 	generateNextChar(possibleChars, hash, options) {
-		var nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
+		const nextChar = possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
 
 		if(!options.allowRepetintion && PasswordGenerator.checkForRepetintion(hash, nextChar) && (options.numbers <= PasswordGenerator.numbersChars.length && options.symbols <= PasswordGenerator.symbolsChars.length)) {
-			nextChar = PasswordGenerator.generateNextChar(possibleChars, hash, options);
+			return PasswordGenerator.generateNextChar(possibleChars, hash, options);
 		}
 
 		return nextChar;
@@ -142,7 +143,7 @@ var PasswordGenerator = {
 	 * @return {String} shuffled string
 	 */
 	shuffleString(finalPassword) {
-		var shuffledString = finalPassword
+		const shuffledString = finalPassword
 			.split('')
 			.sort(() => 0.5 - Math.random()) // eslint-disable-line no-magic-numbers
 			.join('');
