@@ -38,12 +38,12 @@
   },
   "homepage": "https://github.com/luanmuniz/password-generator#readme",
   "devDependencies": {
-    "chai": "4.2.0",
-    "coveralls": "3.0.5",
-    "eslint": "6.0.1",
+    "chai": "4.3.6",
+    "coveralls": "3.1.1",
+    "eslint": "8.24.0",
     "istanbul": "0.4.5",
-    "jshint": "2.10.2",
-    "mocha": "6.1.4",
+    "jshint": "2.13.5",
+    "mocha": "10.0.0",
     "pre-commit": "1.2.2"
   },
   "dependencies": {}
