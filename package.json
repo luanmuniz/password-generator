@@ -13,7 +13,7 @@
     "eslint": "eslint ./index.js --ext .js --ignore-pattern .npmignore --quiet",
     "licenses": "license-checker --summary --failOn 'GPL;AGPL;LGPL'",
     "test:unit": "node --test",
-    "cover": "c8 --reporter=text --reporter=html --reporter=lcov node --test",
+    "cover": "c8 --check-coverage --statements 100 --branches 100 --functions 100 --lines 100 --reporter=text --reporter=html --reporter=lcov node --test",
     "test": "node --run eslint && node --run licenses && node --run cover",
     "preversion": "rm -rf ./node_modules/ && npm ci && npm test",
     "postversion": "git push && npm publish --access=public && git push --tags"
