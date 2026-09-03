@@ -10,18 +10,14 @@
     "node": ">=12.0.0"
   },
   "scripts": {
-    "eslint": "eslint index.js",
-    "mocha": "mocha --reporter spec",
-    "cover": "istanbul cover _mocha -- -R spec test/* && istanbul check-coverage --statement 100 --branch 100 --line 100 --function 100",
-    "test": "npm run eslint && npm run mocha && npm run cover",
-    "precommit-msg": "echo 'Pre-commit checks...' && exit 0",
+    "eslint": "eslint ./index.js --ext .js --ignore-pattern .npmignore --quiet",
+    "licenses": "license-checker --summary --failOn 'GPL;AGPL;LGPL'",
+    "test:unit": "node --test",
+    "cover": "c8 --reporter=text --reporter=html --reporter=lcov node --test",
+    "test": "node --run eslint && node --run licenses && node --run cover",
     "preversion": "rm -rf ./node_modules/ && npm ci && npm test",
     "postversion": "git push && npm publish --access=public && git push --tags"
   },
-  "pre-commit": [
-    "precommit-msg",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/luanmuniz/password-generator.git"
@@ -38,13 +34,12 @@
   },
   "homepage": "https://github.com/luanmuniz/password-generator#readme",
   "devDependencies": {
-    "chai": "4.3.6",
-    "coveralls": "3.1.1",
-    "eslint": "8.24.0",
-    "istanbul": "0.4.5",
-    "jshint": "2.13.5",
-    "mocha": "10.0.0",
-    "pre-commit": "1.2.2"
-  },
-  "dependencies": {}
+    "@eslint/compat": "2.1.0",
+    "c8": "12.0.0",
+    "eslint": "10.9.1",
+    "eslint-config-luanmuniz": "1.0.0",
+    "eslint-plugin-jest": "29.16.5",
+    "globals": "17.11.0",
+    "license-checker": "25.0.1"
+  }
 }

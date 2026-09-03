@@ -10,3 +10,4 @@ CONTRIBUTING.md
 CODE_OF_CONDUCT.md
 README.md
 *.tgz
+eslint.config.mjs

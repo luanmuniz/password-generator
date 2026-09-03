@@ -1,34 +1,33 @@
-'use strict';
-
-var expect = require('chai').expect;
-var passwordGenerator = require('../index');
+const assert = require('node:assert/strict');
+const { describe, it } = require('node:test');
+const passwordGenerator = require('../index');
 
 describe('generateNextChar', function() {
 	it('generateNextChar function should exist', () => {
-		expect(passwordGenerator).to.have.property('generateNextChar').with.is.a('function');
+		assert.strictEqual(typeof passwordGenerator.generateNextChar, 'function');
 	});
 
 	it('generateNextChar without Repetition', () => {
-		var options = { allowRepetintion: false, numbers: true, symbols: false };
+		const options = { allowRepetintion: false, numbers: true, symbols: false };
 
-		expect(passwordGenerator.generateNextChar('1234', '123', options)).to.be.a('string').and.equal('4');
-		expect(passwordGenerator.generateNextChar('1234', '123', options)).to.be.a('string').and.equal('4');
-		expect(passwordGenerator.generateNextChar('1234', '123', options)).to.be.a('string').and.not.be.oneOf(['1', '2', '3']);
+		assert.strictEqual(passwordGenerator.generateNextChar('1234', '123', options), '4');
+		assert.strictEqual(passwordGenerator.generateNextChar('1234', '123', options), '4');
+		assert.ok(!['1', '2', '3'].includes(passwordGenerator.generateNextChar('1234', '123', options)));
 	});
 
 	it('generateNextChar with Repetition', () => {
-		var options = { allowRepetintion: true, numbers: true, symbols: false };
+		const options = { allowRepetintion: true, numbers: true, symbols: false };
 
-		expect(passwordGenerator.generateNextChar('abcd', 'abc', options)).to.be.a('string').and.be.oneOf(['a', 'b', 'c', 'd']);
-		expect(passwordGenerator.generateNextChar('abc', '123', options)).to.be.a('string').and.be.oneOf(['a', 'b', 'c']);
-		expect(passwordGenerator.generateNextChar('1234', '123', options)).to.be.a('string').and.be.oneOf(['1', '2', '3', '4']);
+		assert.ok(['a', 'b', 'c', 'd'].includes(passwordGenerator.generateNextChar('abcd', 'abc', options)));
+		assert.ok(['a', 'b', 'c'].includes(passwordGenerator.generateNextChar('abc', '123', options)));
+		assert.ok(['1', '2', '3', '4'].includes(passwordGenerator.generateNextChar('1234', '123', options)));
 	});
 
 	it('generateNextChar with Repetition and numbers and symbols', () => {
-		var options = { allowRepetintion: true, numbers: 5, symbols: 5 };
+		const options = { allowRepetintion: true, numbers: 5, symbols: 5 };
 
-		expect(passwordGenerator.generateNextChar('abcd', 'abc', options)).to.be.a('string').and.be.oneOf(['a', 'b', 'c', 'd']);
-		expect(passwordGenerator.generateNextChar('abc', '123', options)).to.be.a('string').and.be.oneOf(['a', 'b', 'c']);
-		expect(passwordGenerator.generateNextChar('1234', '123', options)).to.be.a('string').and.be.oneOf(['1', '2', '3', '4']);
+		assert.ok(['a', 'b', 'c', 'd'].includes(passwordGenerator.generateNextChar('abcd', 'abc', options)));
+		assert.ok(['a', 'b', 'c'].includes(passwordGenerator.generateNextChar('abc', '123', options)));
+		assert.ok(['1', '2', '3', '4'].includes(passwordGenerator.generateNextChar('1234', '123', options)));
 	});
 });

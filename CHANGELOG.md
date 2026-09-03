@@ -40,6 +40,12 @@ Using Github Actions as Main CI
 Using const and let over var
 Upgrade Dev Deps
 
+### Version 1.0.8
+
+Upgrade Dev Deps
+Update Github Actions to use modern Node versions
+Replace Mocha and Chai with the Node.js test runner and assertions
+
 Future Features
 =========
 
