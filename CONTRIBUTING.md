@@ -22,3 +22,17 @@ And please:
 If you fixed or added something useful to the project, you can send pull-request. It will be reviewed by maintainer and accepted, or commented for rework, or declined. If you a new and don't know what you should do to send a PR, please see [this tutorial](https://gist.github.com/luanmuniz/da0b8d2152c4877f93c4)
 
 Before sending you Pull Request please don't forget to check your code with `npm test`. PR that don't pass tests will not be accept
+
+## Releasing
+
+Add release notes under `### Unreleased` in `CHANGELOG.md` while preparing changes.
+
+From a clean and up-to-date `master` branch, run the version script with the appropriate semantic version increment:
+
+```bash
+bash version.sh patch
+bash version.sh minor
+bash version.sh major
+```
+
+The script runs the tests, creates and pushes a `release/vX.Y.Z` branch, updates `package.json`, `package-lock.json`, and `CHANGELOG.md`, and commits the release changes. Create and merge a pull request for that branch, then publish a GitHub Release named `vX.Y.Z` from the merge commit. Publishing the GitHub Release triggers the package publishing workflow.
