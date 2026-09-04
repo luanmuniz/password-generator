@@ -35,4 +35,4 @@ bash version.sh minor
 bash version.sh major
 ```
 
-The script runs the tests, creates and pushes a `release/vX.Y.Z` branch, updates `package.json`, `package-lock.json`, and `CHANGELOG.md`, and commits the release changes. Create and merge a pull request for that branch, then publish a GitHub Release named `vX.Y.Z` from the merge commit. Publishing the GitHub Release triggers the package publishing workflow.
+The script runs the tests, creates and pushes a `release/vX.Y.Z` branch, updates `package.json`, `package-lock.json`, and `CHANGELOG.md`, and commits the release changes. It then creates a pull request using GitHub CLI, so authenticate with `gh auth login` first. Merge that pull request, then publish a GitHub Release named `vX.Y.Z` from the merge commit. Publishing the GitHub Release triggers the package publishing workflow.

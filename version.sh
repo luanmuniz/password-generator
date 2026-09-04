@@ -2,6 +2,21 @@
 
 set -euo pipefail
 
+changelog_temporary_file=''
+pull_request_body=''
+
+cleanup() {
+	if [[ -n "$changelog_temporary_file" ]]; then
+		rm -f "$changelog_temporary_file"
+	fi
+
+	if [[ -n "$pull_request_body" ]]; then
+		rm -f "$pull_request_body"
+	fi
+}
+
+trap cleanup EXIT
+
 usage() {
 	echo 'Usage: bash version.sh {patch|minor|major}' >&2
 }
@@ -47,6 +62,23 @@ if ! git remote get-url origin >/dev/null 2>&1; then
 	exit 1
 fi
 
+if ! command -v gh >/dev/null 2>&1; then
+	echo 'GitHub CLI must be installed to create the release pull request.' >&2
+	exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+	echo 'Authenticate GitHub CLI before preparing a release.' >&2
+	exit 1
+fi
+
+pull_request_template='.github/PULL_REQUEST_TEMPLATE/release.md'
+
+if [[ ! -f "$pull_request_template" ]]; then
+	echo "Missing pull request template: $pull_request_template" >&2
+	exit 1
+fi
+
 git fetch origin --tags
 
 if [[ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$default_branch")" ]]; then
@@ -54,39 +86,7 @@ if [[ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$default_branch")" ]];
 	exit 1
 fi
 
-current_version="$(node -p "require('./package.json').version")"
-next_version="$(node - "$release_type" <<'NODE'
-const releaseType = process.argv[2];
-const currentVersion = require('./package.json').version;
-const match = currentVersion.match(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
-
-if (!match) {
-	console.error(`Unsupported current version: ${currentVersion}`);
-	process.exit(1);
-}
-
-let [, major, minor, patch] = match.map(Number);
-
-if (releaseType === 'major') {
-	major += 1;
-	minor = 0;
-	patch = 0;
-} else if (releaseType === 'minor') {
-	minor += 1;
-	patch = 0;
-} else {
-	patch += 1;
-}
-
-process.stdout.write(`${major}.${minor}.${patch}`);
-NODE
-)"
-release_branch="release/v$next_version"
-
-if git show-ref --verify --quiet "refs/heads/$release_branch" || git show-ref --verify --quiet "refs/remotes/origin/$release_branch"; then
-	echo "Release branch $release_branch already exists." >&2
-	exit 1
-fi
+current_version="$(npm pkg get version | tr -d '"')"
 
 if ! grep -Fqx '### Unreleased' CHANGELOG.md; then
 	echo 'CHANGELOG.md must contain a "### Unreleased" heading.' >&2
@@ -98,30 +98,49 @@ if ! grep -Fqx 'Future Features' CHANGELOG.md; then
 	exit 1
 fi
 
-echo "Preparing $current_version -> $next_version"
+echo "Preparing a $release_type release from $current_version"
 npm ci
 npm test
+npm pack --dry-run
 
-git switch -c "$release_branch"
-npm version "$next_version" --no-git-tag-version --ignore-scripts
+preparation_branch="release/prepare-$release_type-$(date +%s)"
+git switch -c "$preparation_branch"
+npm version "$release_type" --no-git-tag-version --ignore-scripts
+next_version="$(npm pkg get version | tr -d '"')"
+release_branch="release/v$next_version"
 
-node - "$next_version" <<'NODE'
-const { readFileSync, writeFileSync } = require('node:fs');
+echo "Prepared $current_version -> $next_version"
 
-const version = process.argv[2];
-const changelogPath = 'CHANGELOG.md';
-const changelog = readFileSync(changelogPath, 'utf8');
-const futureFeaturesHeading = '\nFuture Features\n';
-const versionedChangelog = changelog.replace('### Unreleased', `### Version ${version}`);
+if git show-ref --verify --quiet "refs/heads/$release_branch" || git show-ref --verify --quiet "refs/remotes/origin/$release_branch"; then
+	echo "Release branch $release_branch already exists." >&2
+	exit 1
+fi
 
-writeFileSync(changelogPath, versionedChangelog.replace(futureFeaturesHeading, `\n### Unreleased\n${futureFeaturesHeading}`));
-NODE
+git branch -m "$release_branch"
+
+changelog_temporary_file="$(mktemp)"
+
+while IFS= read -r changelog_line || [[ -n "$changelog_line" ]]; do
+	if [[ "$changelog_line" == '### Unreleased' ]]; then
+		printf '### Version %s\n' "$next_version"
+	elif [[ "$changelog_line" == 'Future Features' ]]; then
+		printf '### Unreleased\n\n'
+		printf '%s\n' "$changelog_line"
+	else
+		printf '%s\n' "$changelog_line"
+	fi
+done < CHANGELOG.md > "$changelog_temporary_file"
+
+mv "$changelog_temporary_file" CHANGELOG.md
+
+pull_request_body="$(mktemp)"
+sed "s/{{VERSION}}/$next_version/g" "$pull_request_template" > "$pull_request_body"
 
 git add package.json package-lock.json CHANGELOG.md
 git commit -m "chore: prepare release $next_version"
 git push --set-upstream origin "$release_branch"
 
-gh pr create --title "Release v$next_version" --body "This pull request prepares the release of v$next_version." --base "$default_branch" --head "$release_branch"
+gh pr create --title "Release v$next_version" --template "$pull_request_body" --base "$default_branch" --head "$release_branch"
 
 echo
 echo "Release v$next_version is prepared on $release_branch."
