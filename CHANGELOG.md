@@ -40,7 +40,7 @@ Using Github Actions as Main CI
 Using const and let over var
 Upgrade Dev Deps
 
-### Unreleased
+### Version 2.0.0
 
 BREAKING CHANGE: The minimum Node.js version required is now 22.0.0
 
@@ -48,6 +48,8 @@ Upgrade Dev Deps
 Update Github Actions to use modern Node versions
 Replace Mocha and Chai with the Node.js test runner and assertions
 Using github actions to publish to both npm and github package registry
+
+### Unreleased
 
 Future Features
 =========
