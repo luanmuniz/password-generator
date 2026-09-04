@@ -119,6 +119,7 @@ fi
 git branch -m "$release_branch"
 
 changelog_temporary_file="$(mktemp)"
+pull_request_body="$(mktemp)"
 
 while IFS= read -r changelog_line || [[ -n "$changelog_line" ]]; do
 	if [[ "$changelog_line" == '### Unreleased' ]]; then
@@ -132,8 +133,6 @@ while IFS= read -r changelog_line || [[ -n "$changelog_line" ]]; do
 done < CHANGELOG.md > "$changelog_temporary_file"
 
 mv "$changelog_temporary_file" CHANGELOG.md
-
-pull_request_body="$(mktemp)"
 sed "s/{{VERSION}}/$next_version/g" "$pull_request_template" > "$pull_request_body"
 
 git add package.json package-lock.json CHANGELOG.md

@@ -16,6 +16,8 @@
 - [ ] Review the changelog entries below and adjust them if needed.
 - [ ] Merge this pull request into `master`.
 - [ ] Publish GitHub Release `v{{VERSION}}` from the merge commit.
+- [ ] Wait for the `Publish packages` workflow to complete.
+- [ ] Inspect and approve the staged npm package.
 
 ## Suggested GitHub Release
 
@@ -32,5 +34,5 @@
 
 ### Upgrade notes
 
-- No special upgrade steps are required.
+- State any breaking changes or required upgrade steps.
 ```

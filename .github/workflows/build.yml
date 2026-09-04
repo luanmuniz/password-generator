@@ -1,6 +1,13 @@
 name: Node.js CI
 
 on:
+  workflow_call:
+    inputs:
+      release-tag:
+        description: Release tag that must match the package version.
+        required: false
+        default: ''
+        type: string
   push:
     branches: [ master ]
   pull_request:
@@ -8,18 +15,26 @@ on:
 
 jobs:
   build:
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-      strategy:
-        matrix:
-          node-version: ['22', '24', '26']
+    permissions:
+      contents: read
 
-      steps:
-        - uses: actions/checkout@v5
-        - name: Use Node.js ${{ matrix.node-version }}
-          uses: actions/setup-node@v5
-          with:
-            node-version: ${{ matrix.node-version }}
-        - run: npm ci
-        - run: npm test
-        - run: npm publish --dry-run
+    strategy:
+      matrix:
+        node-version: ['22', '24', '26']
+
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: node --run test
+      - run: npm pack --dry-run
+      - name: Verify release tag
+        if: inputs.release-tag != ''
+        env:
+          RELEASE_TAG: ${{ inputs.release-tag }}
+        run: test "$RELEASE_TAG" = "v$(npm pkg get version | tr -d '\"')"

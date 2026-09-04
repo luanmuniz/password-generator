@@ -42,6 +42,8 @@ Upgrade Dev Deps
 
 ### Unreleased
 
+BREAKING CHANGE: The minimum Node.js version required is now 22.0.0
+
 Upgrade Dev Deps
 Update Github Actions to use modern Node versions
 Replace Mocha and Chai with the Node.js test runner and assertions
