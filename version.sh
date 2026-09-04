@@ -139,7 +139,7 @@ git add package.json package-lock.json CHANGELOG.md
 git commit -m "chore: prepare release $next_version"
 git push --set-upstream origin "$release_branch"
 
-gh pr create --title "Release v$next_version" --template "$pull_request_body" --base "$default_branch" --head "$release_branch"
+gh pr create --title "Release v$next_version" --body-file "$pull_request_body" --base "$default_branch" --head "$release_branch"
 
 echo
 echo "Release v$next_version is prepared on $release_branch."

@@ -63,7 +63,7 @@ if [[ "$1" == 'pr' && "$2" == 'create' ]]; then
 	printf '%s\\n' "$@" > "$GH_ARGUMENTS_PATH"
 
 	while [[ $# -gt 0 ]]; do
-		if [[ "$1" == '--template' ]]; then
+		if [[ "$1" == '--body-file' ]]; then
 			cp "$2" "$GH_TEMPLATE_PATH"
 			break
 		fi
@@ -134,6 +134,8 @@ describe('version.sh', () => {
 				assert.match(output, /https:\/\/github\.com\/example\/version-script-test\/pull\/1/);
 				assert.match(pullRequestArguments, new RegExp(`--title\\nRelease v${expectedVersion.replaceAll('.', '\\.')}`));
 				assert.match(pullRequestArguments, new RegExp(`--base\\nmaster\\n--head\\n${releaseBranch}`));
+				assert.match(pullRequestArguments, /--body-file/);
+				assert.doesNotMatch(pullRequestArguments, /--template/);
 				assert.match(pullRequestTemplate, new RegExp(`Release v${expectedVersion.replaceAll('.', '\\.')}`));
 				assert.match(pullRequestTemplate, /## Suggested GitHub Release/);
 				assert.match(pullRequestTemplate, /# Release v/);
