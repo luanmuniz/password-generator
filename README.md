@@ -6,6 +6,8 @@ A small library to generate random strings
 
 ## Installation
 
+Requires Node.js 22 or later.
+
 ```shell
 $ npm install --save @luanmuniz/password-generator
 ```

@@ -1,116 +1,129 @@
-'use strict';
+const assert = require('node:assert/strict');
+const { describe, it } = require('node:test');
+const passwordGenerator = require('../index');
 
-var expect = require('chai').expect,
-	passwordGenerator = require('../index'),
-	numberRegex = /[0-9]/g,
-	symbolsRegex = /[^0-9a-zA-Z]/g,
-	UpperCaseRegex = /[A-Z]/g;
+const numberRegex = /[0-9]/g;
+const symbolsRegex = /[^0-9a-zA-Z]/g;
+const UpperCaseRegex = /[A-Z]/g;
 
 describe('generate', function() {
 	it('Generate function should exist', () => {
-		expect(passwordGenerator).to.have.property('generate').with.is.a('function');
+		assert.strictEqual(typeof passwordGenerator.generate, 'function');
 	});
 
 	it('Generate should generate a random string', () => {
-		var stringGenerated = passwordGenerator.generate();
+		const stringGenerated = passwordGenerator.generate();
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.have.length(5);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 5);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with size equal to 20 as number', () => {
-		var stringGenerated = passwordGenerator.generate(20);
+		const stringGenerated = passwordGenerator.generate(20);
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(20);
-		expect(stringGenerated.match(numberRegex)).to.have.length(5);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 20);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 5);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with size equal to 20 as param', () => {
-		var stringGenerated = passwordGenerator.generate({ size: 20 });
+		const stringGenerated = passwordGenerator.generate({ size: 20 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(20);
-		expect(stringGenerated.match(numberRegex)).to.have.length(5);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 20);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 5);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with allowUppercase false', () => {
-		var stringGenerated = passwordGenerator.generate({ allowUppercase: false });
+		const stringGenerated = passwordGenerator.generate({ allowUppercase: false });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(UpperCaseRegex)).to.be.equal(null);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(UpperCaseRegex) || []).length, 0);
 	});
 
 	it('Generate should generate a random string with numbers as false', () => {
-		var stringGenerated = passwordGenerator.generate({ numbers: false });
+		const stringGenerated = passwordGenerator.generate({ numbers: false });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.equal(null);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 0);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with numbers as 10', () => {
-		var stringGenerated = passwordGenerator.generate({ numbers: 10 });
+		const stringGenerated = passwordGenerator.generate({ numbers: 10 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.have.length(10);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 10);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with numbers equal to size', () => {
-		var stringGenerated = passwordGenerator.generate({ numbers: 16 });
+		const stringGenerated = passwordGenerator.generate({ numbers: 16 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.length(11);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 11);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with numbers equal to size and symbol equal to false', () => {
-		var stringGenerated = passwordGenerator.generate({ numbers: 16, symbols: false });
+		const stringGenerated = passwordGenerator.generate({ numbers: 16, symbols: false });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.length(16);
-		expect(stringGenerated.match(symbolsRegex)).to.be.equal(null);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 16);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 0);
 	});
 
 	it('Generate should generate a random string with numbers bigger than size', () => {
-		var stringGenerated = passwordGenerator.generate({ numbers: 20 });
+		const stringGenerated = passwordGenerator.generate({ numbers: 20 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.length(11);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(5);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 11);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 5);
 	});
 
 	it('Generate should generate a random string with symbols as false', () => {
-		var stringGenerated = passwordGenerator.generate({ symbols: false });
+		const stringGenerated = passwordGenerator.generate({ symbols: false });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.have.length(5);
-		expect(stringGenerated.match(symbolsRegex)).to.have.equal(null);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 5);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 0);
 	});
 
 	it('Generate should generate a random string with symbols as 10', () => {
-		var stringGenerated = passwordGenerator.generate({ symbols: 10 });
+		const stringGenerated = passwordGenerator.generate({ symbols: 10 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.have.length(5);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(10);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 5);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 10);
 	});
 
 	it('Generate should generate a random string with symbols equal to size', () => {
-		var stringGenerated = passwordGenerator.generate({ symbols: 16 });
+		const stringGenerated = passwordGenerator.generate({ symbols: 16 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.equal(null);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(16);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 0);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 16);
 	});
 
 	it('Generate should generate a random string with symbols bigger than size', () => {
-		var stringGenerated = passwordGenerator.generate({ symbols: 20 });
+		const stringGenerated = passwordGenerator.generate({ symbols: 20 });
 
-		expect(stringGenerated).to.be.a('string').and.to.have.length(16);
-		expect(stringGenerated.match(numberRegex)).to.be.equal(null);
-		expect(stringGenerated.match(symbolsRegex)).to.have.length(16);
+		assert.strictEqual(typeof stringGenerated, 'string');
+		assert.strictEqual(stringGenerated.length, 16);
+		assert.strictEqual((stringGenerated.match(numberRegex) || []).length, 0);
+		assert.strictEqual((stringGenerated.match(symbolsRegex) || []).length, 16);
 	});
 });

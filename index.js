@@ -25,14 +25,14 @@ const PasswordGenerator = {
 			possibleChars += PasswordGenerator.alphabetChars.toUpperCase();
 		}
 
-		for(let i = 0; i < options.size; i++) {
+		for(let i = 0; i < options.size; i++) { // eslint-disable-line id-length
 			finalPassword += PasswordGenerator.generateNextChar(possibleChars, finalPassword, options);
 		}
 
 		if(options.numbers > 0) {
 			finalPassword = finalPassword.substring(0, (finalPassword.length - options.numbers));
 
-			for(let i = 0; i < options.numbers; i++) {
+			for(let i = 0; i < options.numbers; i++) { // eslint-disable-line id-length
 				numberPassword += PasswordGenerator.generateNextChar(PasswordGenerator.numbersChars, numberPassword, options);
 			}
 
@@ -42,7 +42,7 @@ const PasswordGenerator = {
 		if(options.symbols > 0) {
 			finalPassword = finalPassword.substring(0, (finalPassword.length - options.symbols));
 
-			for(let i = 0; i < options.symbols; i++) {
+			for(let i = 0; i < options.symbols; i++) { // eslint-disable-line id-length
 				symbolsPassword += PasswordGenerator.generateNextChar(PasswordGenerator.symbolsChars, symbolsPassword, options);
 			}
 
@@ -61,7 +61,7 @@ const PasswordGenerator = {
 	 */
 	mergeOptions(userOptions) {
 		let userObjOptions = userOptions[0];
-		let defaultValues = {
+		const defaultValues = {
 			size: 16,
 			numbers: 5,
 			symbols: 5,
