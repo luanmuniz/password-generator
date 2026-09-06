@@ -13,3 +13,5 @@ README.md
 *.tgz
 eslint.config.mjs
 version.sh
+benchmark-pr-number.txt
+benchmark-result.json
