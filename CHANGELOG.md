@@ -53,6 +53,7 @@ Using github actions to publish to both npm and github package registry
 
 Add a performance benchmark comparing current working files with a Git baseline.
 Improve password shuffling performance by replacing random sorting with the Fisher-Yates algorithm.
+Fix performance comments by validating benchmark merge commits against their base and PR head and reading existing comments before updating them.
 
 Future Features
 =========

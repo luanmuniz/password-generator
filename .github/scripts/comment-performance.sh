@@ -27,7 +27,6 @@ readonly pr_number="$(< "$pr_number_path")"
 [[ "$BENCHMARK_WORKFLOW_SHA" =~ ^[a-f0-9]{40}$ ]] || fail 'Invalid benchmark workflow commit'
 
 if ! jq -e \
-	--arg workflow_sha "$BENCHMARK_WORKFLOW_SHA" \
 	--argjson expected_scenarios "$EXPECTED_SCENARIOS" \
 	--argjson threshold "$THRESHOLD_PERCENT" '
 		def valid_commit: type == "string" and test("^[a-f0-9]{40}$");
@@ -36,7 +35,6 @@ if ! jq -e \
 		and .thresholdPercent == $threshold
 		and (.baseline.commit | valid_commit)
 		and (.current.commit | valid_commit)
-		and .current.commit == $workflow_sha
 		and (.scenarios | type == "array"
 			and length == ($expected_scenarios | length)
 			and map(.name) == $expected_scenarios
@@ -45,6 +43,18 @@ if ! jq -e \
 	' "$report_path" > /dev/null; then
 	fail 'Invalid performance benchmark report'
 fi
+
+pull_request="$(gh api --method GET "repos/$GH_REPO/pulls/$pr_number")"
+jq -e --arg head "$BENCHMARK_WORKFLOW_SHA" --arg repository "$GH_REPO" \
+	'.head.sha == $head and .base.repo.full_name == $repository' <<< "$pull_request" > /dev/null \
+	|| fail 'Benchmark does not match the pull request'
+
+merge_sha="$(jq -r '.current.commit' "$report_path")"
+baseline_sha="$(jq -r '.baseline.commit' "$report_path")"
+merge_commit="$(gh api --method GET "repos/$GH_REPO/commits/$merge_sha")"
+jq -e --arg merge "$merge_sha" --arg base "$baseline_sha" --arg head "$BENCHMARK_WORKFLOW_SHA" \
+	'.sha == $merge and [.parents[].sha] == [$base, $head]' <<< "$merge_commit" > /dev/null \
+	|| fail 'Benchmark merge commit does not match the base and PR head'
 
 read -r improved unchanged degraded < <(
 	jq -r --argjson threshold "$THRESHOLD_PERCENT" '
@@ -109,7 +119,7 @@ readonly request_path="$temporary_directory/request.json"
 	printf '\nChanges below %s%% are treated as unchanged. Lower time is better.\n' "$THRESHOLD_PERCENT"
 } > "$body_path"
 
-comments="$(gh api --silent --method GET --paginate --slurp "repos/$GH_REPO/issues/$pr_number/comments")"
+comments="$(gh api --method GET --paginate --slurp "repos/$GH_REPO/issues/$pr_number/comments")"
 existing_comment_id="$(jq -r --arg marker "$MARKER" '
 	[.[] | .[] | select(.user.type? == "Bot" and (.body? | type == "string" and contains($marker)))][0].id // empty
 ' <<< "$comments")"
