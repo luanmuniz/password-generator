@@ -1,10 +1,11 @@
 'use strict';
 
 const { execFileSync } = require('node:child_process');
-const { mkdtempSync, rmSync } = require('node:fs');
+const { mkdtempSync, rmSync, writeFileSync } = require('node:fs');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { parseArgs } = require('node:util');
+const { createReport } = require('./report.cjs');
 
 const root = path.resolve(__dirname, '..');
 
@@ -25,7 +26,8 @@ try {
 		baseline: { type: 'string', default: 'master' },
 		rounds: { type: 'string', default: '10' },
 		warmup: { type: 'string', default: '100' },
-		duration: { type: 'string', default: '200' }
+		duration: { type: 'string', default: '200' },
+		output: { type: 'string' }
 	} });
 	for(const name of ['rounds', 'warmup', 'duration']) {
 		if(!Number.isSafeInteger(Number(values[name])) || Number(values[name]) <= 0) {
@@ -62,22 +64,42 @@ try {
 			}
 			process.stderr.write(`Completed round ${round + 1}/${values.rounds}\n`);
 		}
-		const rows = results.baseline[0].map((scenario, index) => {
+		const samples = results.baseline[0].map((scenario, index) => {
 			const baselineSamples = results.baseline.map(round => round[index].microseconds);
 			const currentSamples = results.current.map(round => round[index].microseconds);
 			const baselineMedian = median(baselineSamples);
 			const currentMedian = median(currentSamples);
 			return {
-				Scenario: scenario.name,
-				'Baseline µs/op': baselineMedian.toFixed(3),
-				'Current µs/op': currentMedian.toFixed(3),
-				'Baseline MAD %': (median(baselineSamples.map(value => Math.abs(value - baselineMedian))) / baselineMedian * 100).toFixed(1),
-				'Current MAD %': (median(currentSamples.map(value => Math.abs(value - currentMedian))) / currentMedian * 100).toFixed(1),
-				Speedup: `${(baselineMedian / currentMedian).toFixed(2)}x`
+				name: scenario.name,
+				baselineMicroseconds: baselineMedian,
+				currentMicroseconds: currentMedian,
+				baselineMadPercent: median(baselineSamples.map(value => Math.abs(value - baselineMedian))) / baselineMedian * 100,
+				currentMadPercent: median(currentSamples.map(value => Math.abs(value - currentMedian))) / currentMedian * 100
 			};
 		});
+		const report = {
+			schemaVersion: 1,
+			baseline: { ref: values.baseline, commit: baseline },
+			current: { branch, commit: current },
+			environment: { node: process.version, platform: process.platform, architecture: process.arch },
+			settings: { rounds: Number(values.rounds), warmupMilliseconds: Number(values.warmup), durationMilliseconds: Number(values.duration) },
+			...createReport(samples)
+		};
+		const rows = report.scenarios.map(scenario => ({
+			Scenario: scenario.name,
+			'Baseline µs/op': scenario.baselineMicroseconds.toFixed(3),
+			'Current µs/op': scenario.currentMicroseconds.toFixed(3),
+			'Baseline MAD %': scenario.baselineMadPercent.toFixed(1),
+			'Current MAD %': scenario.currentMadPercent.toFixed(1),
+			Speedup: `${scenario.speedup.toFixed(2)}x`,
+			Evaluation: scenario.evaluation
+		}));
 		console.table(rows);
+		console.log(`${report.summary.evaluation} Changes below ${report.thresholdPercent}% are treated as unchanged.`);
 		console.log('MAD = median absolute deviation between rounds. Speedup >1 means current is faster.');
+		if(values.output) {
+			writeFileSync(values.output, `${JSON.stringify(report, null, '\t')}\n`);
+		}
 	} finally {
 		if(worktreeCreated) {
 			git('worktree', 'remove', baselinePath);

@@ -1,0 +1,154 @@
+name: Post performance comparison
+
+on:
+  workflow_run:
+    workflows: [Node.js CI]
+    types: [completed]
+
+permissions:
+  actions: read
+  issues: write
+
+jobs:
+  comment:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download performance benchmark
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: password-generator-performance
+          path: ${{ runner.temp }}/performance-benchmark
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create or update performance comment
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          BENCHMARK_ARTIFACT_PATH: ${{ runner.temp }}/performance-benchmark
+          BENCHMARK_WORKFLOW_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const artifactPath = process.env.BENCHMARK_ARTIFACT_PATH;
+            const expectedScenarios = [
+              'Default password',
+              '52 unique letters',
+              '1024 characters, repetitions',
+              'Shuffle 16 characters',
+              'Shuffle 52 characters',
+              'Shuffle 1024 characters'
+            ];
+            const marker = '<!-- password-generator-performance -->';
+            const thresholdPercent = 5;
+
+            function parsePullRequestNumber(value) {
+              if (!/^[1-9]\d*$/.test(value)) {
+                throw new Error(`Invalid pull request number: "${value}"`);
+              }
+              return Number(value);
+            }
+
+            function isCommit(value) {
+              return typeof value === 'string' && /^[a-f0-9]{40}$/.test(value);
+            }
+
+            function isPositiveNumber(value) {
+              return typeof value === 'number' && Number.isFinite(value) && value > 0 && value < 1e9;
+            }
+
+            function evaluate(baseline, current) {
+              const changePercent = (current / baseline - 1) * 100;
+              if (changePercent <= -thresholdPercent) return 'Improved';
+              if (changePercent >= thresholdPercent) return 'Degraded';
+              return 'Unchanged';
+            }
+
+            const pullRequestNumber = parsePullRequestNumber(
+              fs.readFileSync(path.join(artifactPath, 'benchmark-pr-number.txt'), 'utf8').trim()
+            );
+            const report = JSON.parse(
+              fs.readFileSync(path.join(artifactPath, 'benchmark-result.json'), 'utf8')
+            );
+
+            if (report.schemaVersion !== 1 || report.thresholdPercent !== thresholdPercent
+              || !isCommit(report.baseline?.commit) || !isCommit(report.current?.commit)
+              || report.current.commit !== process.env.BENCHMARK_WORKFLOW_SHA
+              || !Array.isArray(report.scenarios) || report.scenarios.length !== expectedScenarios.length) {
+              throw new Error('Invalid performance benchmark report');
+            }
+
+            const scenarios = report.scenarios.map((scenario, index) => {
+              if (scenario.name !== expectedScenarios[index]
+                || !isPositiveNumber(scenario.baselineMicroseconds)
+                || !isPositiveNumber(scenario.currentMicroseconds)) {
+                throw new Error(`Invalid performance benchmark scenario at index ${index}`);
+              }
+              return {
+                name: scenario.name,
+                baseline: scenario.baselineMicroseconds,
+                current: scenario.currentMicroseconds,
+                evaluation: evaluate(scenario.baselineMicroseconds, scenario.currentMicroseconds)
+              };
+            });
+
+            const summary = scenarios.reduce((counts, scenario) => {
+              counts[scenario.evaluation] += 1;
+              return counts;
+            }, { Improved: 0, Unchanged: 0, Degraded: 0 });
+            const total = scenarios.length;
+            let evaluation;
+            if (summary.Unchanged === total) {
+              evaluation = `Performance kept the same in all ${total} scenarios.`;
+            } else {
+              const parts = [];
+              if (summary.Improved) parts.push(`improved in ${summary.Improved} scenario${summary.Improved === 1 ? '' : 's'}`);
+              if (summary.Unchanged) parts.push(`kept the same in ${summary.Unchanged} scenario${summary.Unchanged === 1 ? '' : 's'}`);
+              if (summary.Degraded) parts.push(`degraded in ${summary.Degraded} scenario${summary.Degraded === 1 ? '' : 's'}`);
+              evaluation = `Performance ${parts.join(', ').replace(/, ([^,]+)$/, ', and $1')}.`;
+            }
+
+            const rows = scenarios.map(scenario => {
+              const changePercent = (scenario.current / scenario.baseline - 1) * 100;
+              return `| ${scenario.name} | ${scenario.baseline.toFixed(3)} | ${scenario.current.toFixed(3)} | ${changePercent.toFixed(1)}% | ${scenario.evaluation} |`;
+            });
+            const body = [
+              marker,
+              '## Performance comparison',
+              '',
+              evaluation,
+              '',
+              `Compared base \`${report.baseline.commit.slice(0, 7)}\` with this PR's merge commit \`${report.current.commit.slice(0, 7)}\`.`,
+              '',
+              '| Scenario | Base µs/op | PR µs/op | Change | Evaluation |',
+              '| --- | ---: | ---: | ---: | --- |',
+              ...rows,
+              '',
+              `Changes below ${thresholdPercent}% are treated as unchanged. Lower time is better.`
+            ].join('\n');
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pullRequestNumber,
+              per_page: 100
+            });
+            const existingComment = comments.find(comment => comment.user.type === 'Bot'
+              && comment.body.includes(marker));
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pullRequestNumber,
+                body
+              });
+            }

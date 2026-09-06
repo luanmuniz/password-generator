@@ -16,6 +16,7 @@ To pin another baseline or adjust the measurement time:
 ```sh
 npm run bench -- --baseline <commit-or-ref>
 npm run bench -- --rounds 20 --warmup 200 --duration 500
+npm run bench -- --output benchmark-result.json
 ```
 
 `--warmup` and `--duration` are milliseconds per scenario per round. Defaults are
@@ -41,6 +42,11 @@ baseline/current speedup. Each sample is a batch average, not individual-call
 latency. A speedup above 1 means the current code is faster. Run on an idle machine;
 small differences relative to the variation should not be treated as improvements.
 The command fails for incorrect output or execution errors, not timing regressions.
+
+`--output` writes the same measurements as JSON, including a per-scenario
+evaluation. A change of at least 5% is reported as improved or degraded; smaller
+changes are reported as unchanged. Pull-request CI uses this output to update one
+performance comment after the benchmark completes.
 
 The same runner and scenarios test both implementations, so the baseline does not
 need to contain benchmark files. This setup targets this package's dependency-free
