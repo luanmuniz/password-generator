@@ -1,0 +1,35 @@
+name: Post performance comparison
+
+on:
+  workflow_run:
+    workflows: [Node.js CI]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  comment:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Download performance benchmark
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: password-generator-performance
+          path: ${{ runner.temp }}/performance-benchmark
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create or update performance comment
+        env:
+          BENCHMARK_ARTIFACT_PATH: ${{ runner.temp }}/performance-benchmark
+          BENCHMARK_WORKFLOW_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/comment-performance.sh

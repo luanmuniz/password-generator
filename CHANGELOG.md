@@ -51,6 +51,8 @@ Using github actions to publish to both npm and github package registry
 
 ### Unreleased
 
+Add a performance benchmark comparing current working files with a Git baseline.
+
 Future Features
 =========
 
