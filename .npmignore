@@ -1,5 +1,6 @@
 coverage
 test
+bench
 .coveralls.yml
 .editorconfig
 .eslintrc
