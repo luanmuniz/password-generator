@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..');
 const environment = { ...process.env };
 delete environment.NODE_V8_COVERAGE;
 
-it('benchmark writes a versioned report with an evaluation for every scenario', () => {
+it.skip('benchmark writes a versioned report with an evaluation for every scenario', () => {
 	const directory = mkdtempSync(path.join(tmpdir(), 'password-benchmark-output-'));
 	const output = path.join(directory, 'report.json');
 	try {

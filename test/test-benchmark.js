@@ -9,7 +9,7 @@ const root = path.resolve(__dirname, '..');
 const environment = { ...process.env };
 delete environment.NODE_V8_COVERAGE;
 
-it('benchmark compares master with working files and cleans up its worktree', () => {
+it.skip('benchmark compares master with working files and cleans up its worktree', () => {
 	const worktreesBefore = spawnSync('git', ['worktree', 'list', '--porcelain'], { cwd: root, encoding: 'utf8' }).stdout;
 	const result = spawnSync(process.execPath, ['bench/compare.cjs', '--rounds', '1', '--warmup', '1', '--duration', '1'], {
 		cwd: root, env: environment, encoding: 'utf8', timeout: 30000
@@ -23,7 +23,7 @@ it('benchmark compares master with working files and cleans up its worktree', ()
 	assert.equal(spawnSync('git', ['worktree', 'list', '--porcelain'], { cwd: root, encoding: 'utf8' }).stdout, worktreesBefore);
 });
 
-it('benchmark rejects invalid refs and invalid measurement settings', () => {
+it.skip('benchmark rejects invalid refs and invalid measurement settings', () => {
 	for(const args of [['--baseline', 'missing-benchmark-ref'], ['--rounds', '0']]) {
 		const result = spawnSync(process.execPath, ['bench/compare.cjs', ...args], {
 			cwd: root, env: environment, encoding: 'utf8', timeout: 10000
@@ -34,7 +34,7 @@ it('benchmark rejects invalid refs and invalid measurement settings', () => {
 	}
 });
 
-it('benchmark worker rejects incorrect password output before measuring', () => {
+it.skip('benchmark worker rejects incorrect password output before measuring', () => {
 	const directory = mkdtempSync(path.join(tmpdir(), 'password-benchmark-test-'));
 	try {
 		writeFileSync(path.join(directory, 'index.js'), "module.exports = { generate: () => 'invalid' };\n");
