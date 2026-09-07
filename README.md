@@ -93,7 +93,7 @@ Having trouble? Or new ideas? Post a new issue! We will be glad to help you!
 
 [ci-url]: https://github.com/luanmuniz/password-generator/actions/workflows/build
 [ci-image]: https://github.com/luanmuniz/password-generator/actions/workflows/build.yml/badge.svg
-[npm-image]: https://badge.fury.io/js/%40luanmuniz%2Fpassword-generator.svg
+[npm-image]: https://badge.fury.io/js/@luanmuniz%2Fpassword-generator.svg
 [npm-url]: https://npm.im/@luanmuniz/password-generator
 [coverrals-image]: https://coveralls.io/repos/github/luanmuniz/password-generator/badge.svg?branch=master
 [coverrals-url]: https://coveralls.io/github/luanmuniz/password-generator?branch=master
